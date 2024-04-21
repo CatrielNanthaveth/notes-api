@@ -1,4 +1,5 @@
 const Notes = require("../models/Notes");
+const jwt = require('jsonwebtoken');
 
 const getAllNotes = async (req, res, next) => {
     try {
@@ -11,7 +12,22 @@ const getAllNotes = async (req, res, next) => {
 
 const getUserNotes = async (req, res, next) => {
     try {
-        const user_id = req.params.user_id;
+        const token = req.headers['authorization'];
+        if (!token) {
+            return res.status(401).json({ message: 'Token not provided' });
+        }
+
+        let user_id;
+
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            user_id = decoded.id;
+        } catch (error) {
+            console.error('Error al decodificar el token:', error);
+            return res.status(401).json({ message: 'Invalid token' });
+        } 
+
+        console.log('User ID:', user_id);
         const userNotes = await Notes.findAll({
             where: {
                 userId: user_id

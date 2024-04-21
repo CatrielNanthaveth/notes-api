@@ -7,7 +7,7 @@ router.get('/notes', getAllNotes);
 
 router.get('/notes/:id', getSingleNote);
 
-router.get('/notes/user/:user_id', getUserNotes);
+router.get('/notes/by/user', getUserNotes);
 
 router.post('/notes', createNote);
 
