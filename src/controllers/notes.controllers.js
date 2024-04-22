@@ -60,7 +60,21 @@ const getSingleNote = async (req, res, next) => {
 
 const createNote = async (req, res, next) => {
     try {
-        const { title, description, status, category, user_id } = req.body;
+        const { title, description, status, category } = req.body;
+        const token = req.headers['authorization'];
+        if (!token) {
+            return res.status(401).json({ message: 'Token not provided' });
+        }
+
+        let user_id;
+
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            user_id = decoded.id;
+        } catch (error) {
+            console.error('Error al decodificar el token:', error);
+            return res.status(401).json({ message: 'Invalid token' });
+        } 
 
         const newNote = await Notes.create({
             title,
